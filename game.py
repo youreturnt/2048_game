@@ -1,21 +1,78 @@
 import random
 import pygame
 import sys
-from logics import index_elem, get_empty_list, insert_2_or_4, flip_90_array
+
+
+def index_elem(num):  # от 1 до 16
+    num = num - 1
+    x, y = num//4, num % 4
+    return x, y
+
+
+def num_elem(a, b):
+    return a * 4 + b + 1
+
+
+def get_empty_list(mas):
+    empty = []
+    for i in range(4):
+        for j in range(4):
+            if mas[i][j] == 0:
+                num = num_elem(i, j)
+                empty.append(num)
+    return empty
+
+
+def insert_2_or_4(mas, x, y):
+    if random.randint(0, 9) < 8:
+        mas[x][y] = 2
+    else:
+        mas[x][y] = 4
+    return mas
+
+def different_nums(elem1):
+    elem2 = random.randint(1, 16)
+    if elem2 != elem1:
+        return elem2
+    return different_nums(elem1)
 
 
 def mass_frontend(arr3):
     y = 30
     vert = 0
-    for j in range(4):
+    for c0 in range(4):
         x = 30
         gor = 0
-        for i in range(4):
-            font = pygame.font.SysFont('couriernew', 60)
-            text = font.render(str(arr3[vert][gor]), True, colors['full_button'])
+        for c1 in range(4):
+            font = pygame.font.SysFont('couriernew', 60) #шрифт
+            text = font.render(str(arr3[vert][gor]), True,(0, 0, 0))
             screen.blit(text, (x, y))
             x += 90
             gor += 1
+        y += 60
+        vert += 1
+
+
+def mass_frontend1(arr3, turple):
+    y = 30
+    vert = 0
+    for c0 in range(4):
+        x = 30
+        gor = 0
+        for c1 in range(4):
+            font = pygame.font.SysFont('couriernew', 60) #шрифт
+
+            text = font.render(str(arr3[vert][gor]), True, (0, 0, 0))
+
+            text2 = font.render(str(arr3[vert][gor]), True, (255, 255, 255))
+            if c0 == turple[0] and c1 == turple[1]:
+                screen.blit(text2, (x, y))
+                x += 90
+                gor += 1
+            else:
+                screen.blit(text, (x, y))
+                x += 90
+                gor += 1
         y += 60
         vert += 1
 
@@ -64,6 +121,13 @@ def move_right(array):
     return array
 
 
+def flip_90_array(array):
+    arr1 = []
+    for i in list(zip(*array)):
+        arr1.append(list(i))
+    return arr1
+
+
 arr = [
     [0, 0, 0, 0],
     [0, 0, 0, 0],
@@ -74,19 +138,15 @@ arr = [
 colors = {
     'background': (90, 90, 90),
     'empty_button': (130, 130, 120),
-    'full_button': (0, 0, 0)
 }
 
 point = 0
 
 n_elem = random.randint(1, 16)
-n_elem_2 = random.randint(1, 16)
-if n_elem_2 == n_elem:
-    n_elem_2 = random.randint(1, 16)
-
+n_elem2 = different_nums(n_elem)
 
 insert_2_or_4(arr, index_elem(n_elem)[0], index_elem(n_elem)[1])
-insert_2_or_4(arr, index_elem(n_elem_2)[1], index_elem(n_elem_2)[0])
+insert_2_or_4(arr, index_elem(n_elem2)[1], index_elem(n_elem2)[0])
 
 
 pygame.init()
@@ -122,10 +182,12 @@ while point < 2048:
             spisok = len(get_empty_list(arr_1))
             number = random.randint(1, spisok)
 
-            in_el = index_elem(get_empty_list(arr_1)[number - 1])
-            insert_2_or_4(arr_1, in_el[0], in_el[1])
+            in_el = index_elem(get_empty_list(arr_1)[number - 1]) #свободные координаты
+            #print(in_el)
+            insert_2_or_4(arr_1, in_el[0], in_el[1]) # какое число разместить в массиве по свободным координатам
 
             arr = arr_1
             screen.fill(colors['background'])
-            mass_frontend(arr)
+            mass_frontend1(arr, in_el)
+
     pygame.display.flip()
