@@ -30,6 +30,7 @@ def insert_2_or_4(mas, x, y):
         mas[x][y] = 4
     return mas
 
+
 def different_nums(elem1):
     elem2 = random.randint(1, 16)
     if elem2 != elem1:
@@ -37,36 +38,31 @@ def different_nums(elem1):
     return different_nums(elem1)
 
 
-def mass_frontend(arr3):
+def mass_frontend(arr3, turple):
     y = 30
     vert = 0
     for c0 in range(4):
-        x = 30
+        x = 50
         gor = 0
         for c1 in range(4):
-            font = pygame.font.SysFont('couriernew', 60) #шрифт
-            text = font.render(str(arr3[vert][gor]), True,(0, 0, 0))
-            screen.blit(text, (x, y))
-            x += 90
-            gor += 1
-        y += 60
-        vert += 1
+            fonts = pygame.font.SysFont('Terminal', 60) #шрифт
+            font2 = pygame.font.SysFont('Terminal', 50)  #шрифт для трехзначного числа
 
 
-def mass_frontend1(arr3, turple):
-    y = 30
-    vert = 0
-    for c0 in range(4):
-        x = 30
-        gor = 0
-        for c1 in range(4):
-            font = pygame.font.SysFont('couriernew', 60) #шрифт
+            text = fonts.render(str(arr3[vert][gor]), True, (0, 0, 0))
+            text2 = fonts.render(str(arr3[vert][gor]), True, (255, 255, 255)) # для нового числа
+            text3 = font2.render(str(arr3[vert][gor]), True, (0, 0, 0))
 
-            text = font.render(str(arr3[vert][gor]), True, (0, 0, 0))
-
-            text2 = font.render(str(arr3[vert][gor]), True, (255, 255, 255))
             if c0 == turple[0] and c1 == turple[1]:
                 screen.blit(text2, (x, y))
+                x += 90
+                gor += 1
+            elif len(str(arr3[c0][c1])) == 2:
+                screen.blit(text, (x-15, y))
+                x += 90
+                gor += 1
+            elif len(str(arr3[c0][c1])) == 3:
+                screen.blit(text3, (x-20, y))
                 x += 90
                 gor += 1
             else:
@@ -77,47 +73,41 @@ def mass_frontend1(arr3, turple):
         vert += 1
 
 
+def end_game():
+
+    you_dead_font = pygame.font.SysFont('Terminal', 80)  # шрифт
+    you_dead = you_dead_font.render('End Game', True, (255, 0, 0))
+
+    screen.fill(colors['background'])
+    screen.blit(you_dead, (60, 150))
+
+
+
 def move_left(array):
     global point
-    row_list = []  # цифры влево, нули вправо
-    for num in array:
-        if num > 0:
-            row_list.append(num)
-    row_list.extend([0]*array.count(0))
+    array.sort(key=lambda x: x == 0)  # цифры влево, нули вправо
 
-    for i in range(len(row_list)-1):  # суммирует соседние одинаковые цифры
-        if row_list[i] == row_list[i+1]:
-            row_list[i] = (row_list[i])*2
-            point += row_list[i]
-            row_list[i+1] = 0
+    for i in range(len(array)-1):  # суммирует соседние одинаковые цифры
+        if array[i] == array[i+1]:
+            array[i] = (array[i])*2
+            point += array[i]
+            array[i+1] = 0
 
-    array.clear()
-    for n in row_list:  # цифры влево, нули вправо
-        if n > 0:
-            array.append(n)
-    array.extend([0] * row_list.count(0))
+    array.sort(key=lambda x: x == 0) # цифры влево, нули вправо
     return array
 
 
 def move_right(array):
     global point
-    row_lis = []
-    row_lis.extend([0] * array.count(0))
-    for num in reversed(array):
-        if num > 0:
-            row_lis.append(num)
+    array.sort(key=lambda x: x != 0)  # цифры вправо, нули влево
 
-    for i in range(len(row_lis)-1):  # суммирует соседние одинаковые цифры
-        if row_lis[i] == row_lis[i+1]:
-            row_lis[i] = (row_lis[i])*2
-            point += row_lis[i]
-            row_lis[i+1] = 0
+    for i in reversed (range(len(array)-1)):  # суммирует соседние одинаковые цифры
+        if array[i] == array[i + 1]:
+            array[i] = (array[i]) * 2
+            point += array[i]
+            array[i + 1] = 0
 
-    array.clear()
-    array.extend([0] * row_lis.count(0))
-    for n in reversed(row_lis):  # цифры влево, нули вправо
-        if n > 0:
-            array.append(n)
+    array.sort(key=lambda x: x != 0) # цифры вправо, нули влево
     return array
 
 
@@ -145,23 +135,34 @@ point = 0
 n_elem = random.randint(1, 16)
 n_elem2 = different_nums(n_elem)
 
+print(n_elem, n_elem2)
+
 insert_2_or_4(arr, index_elem(n_elem)[0], index_elem(n_elem)[1])
 insert_2_or_4(arr, index_elem(n_elem2)[1], index_elem(n_elem2)[0])
-
 
 pygame.init()
 screen = pygame.display.set_mode((400, 500))
 screen.fill(colors['background'])
 
-mass_frontend(arr)
+mass_frontend(arr, (10,10) ) #выводит массив в окно
 
-while point < 2048:
-    arr_1 = []
+font = pygame.font.SysFont('Terminal', 60) #шрифт
+text_score = font.render('score: ', True, (0, 0, 0))
+
+
+while point < 30000:
+    screen.blit(text_score, (50, 350))
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        arr_1 = []
+        text_point = font.render(str(point), True, (0, 0, 0))
+
+        screen.blit(text_point, (250, 350))
+
+        if event.type == pygame.QUIT: #Если одно из событий соответствует сигналу к завершению программы, закрываем окно.
             pygame.quit()
             sys.exit()
-        if event.type == pygame.KEYDOWN:
+
+        elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 for string in arr:
                     arr_1.append(move_left(string))
@@ -177,17 +178,20 @@ while point < 2048:
                     arr_1.append(move_right(string))
                 arr_1 = flip_90_array(arr_1)
 
-            print(point, 'point')
+            spisok = len(get_empty_list(arr_1)) #количество нулей (свободных мест) в массиве
+            if spisok == 0:
+                end_game()
+                break
 
-            spisok = len(get_empty_list(arr_1))
-            number = random.randint(1, spisok)
+            else:
+                number = random.randint(1, spisok) #
 
-            in_el = index_elem(get_empty_list(arr_1)[number - 1]) #свободные координаты
-            #print(in_el)
-            insert_2_or_4(arr_1, in_el[0], in_el[1]) # какое число разместить в массиве по свободным координатам
+                in_el = index_elem(get_empty_list(arr_1)[number - 1]) #свободные координаты
+                insert_2_or_4(arr_1, in_el[0], in_el[1]) # какое число разместить в массиве по свободным координатам
 
-            arr = arr_1
-            screen.fill(colors['background'])
-            mass_frontend1(arr, in_el)
+                arr = arr_1
+                screen.fill(colors['background'])
 
-    pygame.display.flip()
+                mass_frontend(arr_1, in_el) #массив с новым числом
+
+        pygame.display.flip()
